@@ -16,7 +16,7 @@ colored_header(
 start_time = time.time()
 
 # Assuming 'df' is your DataFrame containing news data
-df = pd.read_csv('./assets/dfdf.csv') # Replace with your actual file path
+df = pd.read_csv('./assets/df.csv') # Replace with your actual file path
 #ambil df yang datanya berlabelkan positive saja, hapus index
 df=df[df['label']=='positive'].reset_index(drop=True)
 

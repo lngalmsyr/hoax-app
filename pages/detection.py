@@ -10,14 +10,14 @@ from sklearn.metrics.pairwise import cosine_similarity
 #load data
 import pandas as pd
 
-df = pd.read_csv('./assets/dfdf.csv')
+df = pd.read_csv('./assets/df.csv')
 
-model_pkl_file = "./assets/fix_model_cpu.pkl"  # load model from pickle file
+model_pkl_file = "./fix_model_cpu.pkl"  # load model from pickle file
 with open(model_pkl_file, 'rb') as file:
     model = pickle.load(file)
 
 # save the iris classification model as a pickle file
-tokenizer_pkl_file = "./assets/fix_tokenizer.pkl"
+tokenizer_pkl_file = "./fix_tokenizer.pkl"
 with open(tokenizer_pkl_file, 'rb') as file:
     loaded_tokenizer = pickle.load(file)
 
