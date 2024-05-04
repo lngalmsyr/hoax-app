@@ -1,25 +1,20 @@
-
-import torch
 import streamlit as st
 from st_pages import add_page_title
 from streamlit_extras.colored_header import colored_header
-import pickle
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
+from transformers import AutoTokenizer, AutoModelForSequenceClassification, Trainer
+import numpy as np
 
 #load data
 import pandas as pd
 
 df = pd.read_csv('./assets/df.csv')
 
-model_pkl_file = "./fix_model_cpu.pkl"  # load model from pickle file
-with open(model_pkl_file, 'rb') as file:
-    model = pickle.load(file)
-
-# save the iris classification model as a pickle file
-tokenizer_pkl_file = "./fix_tokenizer.pkl"
-with open(tokenizer_pkl_file, 'rb') as file:
-    loaded_tokenizer = pickle.load(file)
+# Load Tokenizer and Model (assuming you've saved them correctly)
+tokenizer = AutoTokenizer.from_pretrained("lngalmsyr/hoax-appClass")
+model = AutoModelForSequenceClassification.from_pretrained("lngalmsyr/hoax-appClass")
+trainer = Trainer(model=model)
 
 add_page_title(layout="wide")
 colored_header(
@@ -28,25 +23,19 @@ colored_header(
     color_name="violet-70",
 )
 
-# Fungsi Prediksi (updated based on predict2)
+# Prediction Function (modified to handle potential indexing issues)
 def predict(text):
-    """Melakukan prediksi sentimen pada teks menggunakan model yang dimuat."""
-    encoded_input = loaded_tokenizer(text, return_tensors='pt', padding='max_length', max_length=256)
+    # Tokenize the text
+    tokenized = tokenizer(text, padding='max_length', max_length=256)
 
-    # Pastikan model dan input berada pada device yang sama (misalnya GPU)
-    device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
-    model.to(device)  # Pindahkan model ke device yang dipilih
-    encoded_input = {k: v.to(device) for k, v in encoded_input.items()}  # Pindahkan input ke device yang sama
+    # Make prediction and get the label index directly
+    label = trainer.predict([tokenized]).predictions.argmax(1)[0]
 
-    # Prediksi dengan model (forward pass)
-    with torch.no_grad():
-        output = model(**encoded_input)
-
-    # Mendapatkan logits dan label
-    logits = output.logits
-    label = torch.argmax(logits, dim=1).item()
-
-    return label
+    # Return prediction as text
+    if label == 0:
+        return f'Predicted: Negatif [{label}], berita ini merupakan fakta'
+    elif label == 1:
+        return f'Predicted: Positif [{label}], berita ini merupakan hoax/palsu'
 
 # Form Input dan Deteksi
 text = st.text_input('Silahkan Masukkan Kata Kunci')
@@ -56,13 +45,11 @@ with col1:
     #buat disclaimer berwarna merah
     if st.button('Detect'):
         if text:
-            label = predict(text)
-            if label == 0:
-                st.write(f'Predicted: Negatif [{label}], berita ini merupakan fakta')
-            elif label == 1:
-                st.write(f'Predicted: Positif [{label}], berita ini merupakan hoax/palsu')
-            else:
-                st.write('Masukkan Kata Kunci Berita Untuk Mengecek Keberitaan')
+            prediction_result = predict(text)
+            st.write(prediction_result)
+        else:
+            st.write('Masukkan Kata Kunci Berita Untuk Mengecek Keberitaan')
+
 
     #buat text seperti warning didalam kotak kuning
     
