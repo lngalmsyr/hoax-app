@@ -5,6 +5,7 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 from transformers import AutoTokenizer, AutoModelForSequenceClassification, Trainer
 import numpy as np
+import torch
 
 #load data
 import pandas as pd
