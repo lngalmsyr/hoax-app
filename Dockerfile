@@ -2,7 +2,8 @@ FROM python:3.9-slim
 
 # Install Python dependencies
 RUN pip install --upgrade pip
-
+RUN pip install torch 
+RUN pip install transformers[torch]
 
 # Set working directory
 WORKDIR /app
