@@ -4,5 +4,4 @@ scikit_learn==1.2.2
 st_pages==0.4.5
 streamlit==1.32.2
 streamlit_extras==0.4.2
-torch==2.3.0
 transformers==4.40.1
